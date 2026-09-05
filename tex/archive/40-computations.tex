@@ -1,0 +1,42 @@
+\section{Computational audit}\label{sec:computations}
+
+The computational claims made above were obtained by exhaustive search where
+the size of the problem allows it.  This section is the retained record: what
+was searched, over what range, with which program, and what was found.  A
+negative finding belongs here even when --- especially when --- it closed a
+route, because the range over which something was checked is the part that a
+later argument needs and the part that is easiest to lose.
+
+\emph{The conjecture itself.}  Every even $n$ with $4\leq n\leq10^{8}$ is a
+\term{goldbach-number}, by the reflection of Lemma~\ref{reflect:lem} evaluated
+once per $n$ with an early stop at the first witness
+(\texttt{tools/cpp/goldbach.cpp}, retained output
+\texttt{tools/logs/goldbach-1e8.log}).  The largest least prime summand needed
+over that range is $1093$, at $n=60\,119\,912$; the search is therefore cheap,
+and the bound on it is memory rather than time.  The early stop discards only
+the further witnesses for an $n$ already known to be a Goldbach number, so it
+does not weaken the conclusion.
+
+\emph{The Goldbach count.}  Computing $\gc(n)$ needs every witness rather than
+the first, which is quadratic, so it was evaluated only on an initial range:
+$\min\{\gc(n):4\leq n\leq20\,000\}=1$, attained exactly at $n\in\{4,6\}$.  Those
+are the only two integers in range whose sole representation is the diagonal
+one.
+
+\emph{The distinctness strengthening.}  Removing the diagonal from the
+intersection of Lemma~\ref{reflect:lem} leaves it empty exactly at $n=4$ and
+$n=6$, over all even $n\leq10^{6}$
+(\texttt{tools/python/distinct\_goldbach.py}, retained output
+\texttt{tools/logs/distinct-primes-1e6.log}).  This is what closes the route of
+\S\ref{sec:distinct}.  The structural reason, and not merely the two
+counterexamples, is what makes the finding reusable: the diagonal is available
+exactly when $n/2$ is prime, so the strengthening fails precisely where the
+diagonal pair is the only pair, and it is true from $8$ onwards.  No
+sieve-theoretic argument would have detected this, because the
+\term{sifted-count} of Definition~\ref{sifted:def} is insensitive to the
+diagonal --- which is the general lesson, and the reason this paragraph is
+here rather than in a private note.
+
+These are computational observations.  Where one supports a statement in the
+results edition, that statement names the program and the command; where it
+merely records what a search did not find, it is not used as a theorem.

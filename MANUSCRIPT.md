@@ -4,6 +4,11 @@ This file is the contract for how work is recorded.  It is the first thing to
 read after `README.md`, and the thing to re-read when you are unsure where
 something belongs.
 
+The manuscript is the single source of truth.  There is no notes directory and
+no separate memory store: a fact worth keeping is written into `tex/`, where
+the checks can see it and a reader can find it.  If a fact fits nowhere below,
+that is a sign it is not yet a fact.
+
 ## The three editions
 
 The project has one mathematical source of truth and three reader views:

@@ -5,17 +5,21 @@ that runs for months, is worked on largely by AI agents under human
 supervision, and whose value lies as much in what it records about failed
 approaches as in what it proves.
 
-It gives you four things, wired together:
+It gives you three things, wired together:
 
 | | |
 | --- | --- |
 | `tex/` | a **three-edition manuscript** — established results, live routes, and a full working record — built into six PDFs with cross-document links |
 | `tools/` | a **computational toolkit** (C++ and Python) with a rule that every computational claim names its program, its command, and its log |
 | `formal/` | a **Lean 4 / mathlib** development with a blueprint mapping every manuscript label to its formal counterpart |
-| `notes/` | the **agent's memory**, mirrored into the repository: one dead end per file |
 
 and, holding them together, `make check`: a set of consistency checks that fail
 the build when the record and the mathematics drift apart.
+
+There is deliberately **no notes or scratch directory**. The manuscript is the
+single source of truth: a fact worth keeping is written into `tex/`, where the
+checks can see it and a reader can find it. A parallel notes store starts as a
+convenience and ends as a lagging copy that quietly contradicts the paper.
 
 <!-- TEMPLATE-NOTE-START -->
 ## About this template
@@ -159,7 +163,6 @@ formal/
   BLUEPRINT.md       manuscript label -> Lean name, with coverage and deviations
   Scaffold/          Basic, Results/, and a Tests/ module per result
 
-notes/               mirrored agent memory: one dead end per file
 ```
 
 ## Continuous integration

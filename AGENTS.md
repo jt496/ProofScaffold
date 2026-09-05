@@ -14,9 +14,10 @@ how to work within it.
 1. `tex/routes/00-status-map.tex` — the only maintained statement of where the
    problem stands.  Everything else describing status is out of date by
    construction.
-2. `notes/MEMORY.md` and the notes it indexes — the obituaries for approaches
-   that provably cannot work.  These are the most valuable files here.  Reading
-   them is what stops the search from cycling.
+2. the closed routes in `tex/routes/`, and the computational audit in
+   `tex/archive/` — the obituaries for approaches that provably cannot work.
+   These are the most valuable prose in the project.  Reading them is what
+   stops the search from cycling.
 3. `formal/BLUEPRINT.md` if you will touch Lean.
 
 ## The rules that matter
@@ -36,7 +37,8 @@ words, and keep it in the companion.
 **A refuted route is not deleted.**  It stays in `tex/routes/`, marked closed,
 with the exact counterexample and the reason it fails.  Deleting it guarantees
 that someone — quite possibly you, three months from now — tries it again.  Add
-a note in `notes/` too when the failure is structural rather than incidental.
+the structural reason to `tex/archive/40-computations.tex` when the failure
+rules out more than the one route.
 
 **Status is asserted in exactly one place**, the route table.  Do not restate
 it in an abstract, an introduction, or a computational remark.
@@ -79,14 +81,24 @@ than presenting the argument as finished and leaving the gap to be discovered.
 If a route died, say what killed it — that is a result, and it is often the
 most useful thing a session produces.
 
-## Notes and memory
+## The manuscript is the single source of truth
 
-`notes/` mirrors the agent's persistent memory: one fact or route per file,
-linked by `[[wiki-style]]` name, indexed in `notes/MEMORY.md`.  Write a note
-when you learn something that is *not* recoverable from the manuscript or the
-git history — why an approach cannot work, what a computation ruled out, which
-reformulation turned out to be equivalent.  Do not write notes that restate the
-paper.
+There is no notes directory, no scratch file, and no parallel memory store in
+this repository, and you should not create one.  When you learn something worth
+keeping — why an approach cannot work, what a computation ruled out, which
+reformulation turned out to be equivalent — write it into the manuscript: a
+closed route in `tex/routes/`, or the computational audit in
+`tex/archive/40-computations.tex`.
+
+This is not tidiness.  A side store always begins as the convenient place to
+put a fact that does not yet fit, and ends as a stale copy that contradicts the
+paper without anything noticing: `make check` cannot see it, a reader will not
+find it, and the version in the paper and the version in the note drift until
+nobody knows which is current.  If a fact does not fit anywhere in `tex/`, that
+is evidence it is not yet a fact — say so in the session summary instead.
+
+Your own cross-session memory, if you have one, is a different thing and is
+yours to keep.  Do not mirror it into the repository.
 
 ## Git
 

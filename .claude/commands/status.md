@@ -8,7 +8,8 @@ this order, and say plainly when they disagree:
 1. `tex/routes/00-status-map.tex` — the route table. This is the only place
    status is asserted; treat it as authoritative.
 2. `tex/manifests/results.tex` — what is actually proved, module by module.
-3. `notes/MEMORY.md` and the notes it indexes — what is known to be dead.
+3. the closed routes in `tex/routes/` and the audit in `tex/archive/` — what
+   is known to be dead.
 4. `formal/BLUEPRINT.md` — the Coverage table, if `formal/` is in use.
 5. `git log --oneline -20` — what has moved recently.
 

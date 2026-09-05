@@ -163,6 +163,15 @@ Def.~\ref{object:def}\\
 \end{longtable}
 \endgroup
 """,
+'tex/archive/40-computations.tex': r"""\section{Computational audit}\label{sec:computations}
+
+The retained record of what was searched, over what range, with which program,
+and what was found.  A negative finding belongs here even when --- especially
+when --- it closed a route: the range over which something was checked is the
+part a later argument needs, and the part that is easiest to lose.
+
+Nothing has been computed yet.
+""",
 'tex/manifests/results.tex': r"""% Established mathematics only.  Each statement and proof is owned by exactly
 % one module; the routes companion imports these labels through xr-hyper.
 % Nothing in this manifest may refer to a route- or archive-owned label --
@@ -191,6 +200,10 @@ Def.~\ref{object:def}\\
 
 \part{Open programmes}
 \input{tex/routes/10-first-route}
+
+\appendix
+\part{Archive}
+\input{tex/archive/40-computations}
 """,
 'tex/frontmatter/results.tex': r"""\maketitle
 \begin{abstract}
@@ -278,8 +291,6 @@ int main(int argc, char** argv) {
     return failures ? 1 : 0;
 }
 """,
-'notes/MEMORY.md': "",
-'notes/README.md': None,          # rewritten below, needs the index emptied
 }
 
 
@@ -352,7 +363,6 @@ def strip_example(camel, dry):
         'tools/python/goldbach_counts.py',
         'tools/logs/goldbach-1e8.log',
         'tools/logs/distinct-primes-1e6.log',
-        'notes/goldbach-distinct-refuted.md',
         f'formal/{camel}/Basic.lean',
         f'formal/{camel}/Results/Goldbach.lean',
         f'formal/{camel}/Tests/Goldbach.lean',
@@ -519,13 +529,6 @@ tools/cpp/example 10
 
 `make audit` runs the fast subset of these; CI runs the same target.
 """)
-
-    # notes/README.md: keep the doctrine, empty the index.
-    nr = ROOT / 'notes' / 'README.md'
-    text = nr.read_text()
-    text = re.sub(r'(?s)\n## Index\n.*\Z',
-                  '\n## Index\n\n| note | what it says |\n| --- | --- |\n', text)
-    nr.write_text(text)
 
     # The Makefile audit target names the example programs.
     mk = ROOT / 'Makefile'

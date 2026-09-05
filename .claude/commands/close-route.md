@@ -18,9 +18,9 @@ attempted again.
    narrower range, or nothing.
 4. Update the row in `tex/routes/00-status-map.tex` to `closed by
    Proposition~\ref{...}`. Once, and nowhere else.
-5. Write a note in `notes/` if the failure rules out more than this one route:
-   one file, frontmatter as in the existing notes, `**Why:**` and
-   `**How to apply:**` lines, and an index line in `notes/MEMORY.md`. This is
-   the most valuable artefact of a dead route.
+5. If the failure rules out more than this one route, add the structural reason
+   to the computational audit in `tex/archive/40-computations.tex`. That
+   paragraph is the most valuable artefact of a dead route, and it belongs in
+   the manuscript — do not start a notes file for it.
 
 Finish with `make all` and, if you added a program, `make audit`.
