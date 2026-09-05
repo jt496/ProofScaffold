@@ -644,7 +644,10 @@ Next:
     make all            # six PDFs and every check; should pass as-is
     git add -A && git commit -m 'Initialise {camel}'
 
-Then read MANUSCRIPT.md, write your conjecture into {where}.""")
+Then read MANUSCRIPT.md, write your conjecture into {where}.
+
+The LICENSE file still carries the scaffold author's copyright line; put your
+own name on it, or replace the file, before the work is yours.""")
     return 0
 
 

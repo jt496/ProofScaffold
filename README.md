@@ -167,3 +167,13 @@ notes/               mirrored agent memory: one dead end per file
 `.github/workflows/ci.yml` builds the manuscript, runs `make check`, and runs
 `make audit`, on every push.  The Lean job is skipped unless the repository
 variable `ENABLE_LEAN` is `true`.
+
+## License
+
+MIT — see [`LICENSE`](LICENSE).
+
+That covers the scaffold: the build system, the checks, the toolkit skeleton
+and the documentation. If you start a project from this template, the
+mathematics you then write is yours, and you should put your own name on it —
+edit the copyright line in `LICENSE`, or replace the file with whatever licence
+you want your project under.
