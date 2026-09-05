@@ -10,7 +10,7 @@ jobs:
     name: manuscript and checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install TeX Live
         run: |
@@ -25,7 +25,7 @@ jobs:
         run: make all
 
       - name: Upload PDFs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: pdfs
           path: output/pdf/
@@ -35,7 +35,7 @@ jobs:
     name: computational audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       # Every program here exits non-zero on failure and prints a pass/fail
       # line, so this job needs no human reading its output.
       - name: Build and audit
@@ -48,7 +48,7 @@ jobs:
     # repository variable ENABLE_LEAN to `true` once formal/ is in use.
     if: vars.ENABLE_LEAN == 'true'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install elan
         run: |
