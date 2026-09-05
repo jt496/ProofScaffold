@@ -11,6 +11,11 @@
 build/
 tmp/
 
+# ...but a retained log under tools/logs/ is evidence for a manuscript claim,
+# not a build product.  If a claim names a log, that log must be in the repo.
+!tools/logs/*.log
+!tools/logs/*.txt
+
 # Lean
 .lake/
 

@@ -1,0 +1,5 @@
+# tools/cpp/goldbach 100000000
+# 2026-09-05T12:27:42Z, g++ 13, -O3 -march=native -std=c++17
+N=100000000  even n in [4,N]: 49999999  failures: 0
+largest least prime summand: 1093, at n=60119912
+ALL GOLDBACH VERIFICATION ASSERTIONS PASSED
