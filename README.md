@@ -168,8 +168,23 @@ formal/
 ## Continuous integration
 
 `.github/workflows/ci.yml` builds the manuscript, runs `make check`, and runs
-`make audit`, on every push.  The Lean job is skipped unless the repository
-variable `ENABLE_LEAN` is `true`.
+`make audit`.
+
+**It runs automatically only while the repository is public.**  Actions minutes
+are free on public repositories and metered on private ones, and a project
+started from this template is usually private and pushed to often.  On a
+private repository every job is skipped, and a skipped job allocates no runner
+and costs nothing — so the workflow can sit in the tree unused until you want
+it, rather than having to be deleted and later reconstructed.
+
+Build locally instead: `make all` runs exactly the same checks in seconds, and
+`AGENTS.md` already requires it before work is called done.
+
+To use CI on a private repository, either trigger a run by hand from the
+Actions tab, or set the repository variable `ENABLE_CI` to `true` under
+*Settings → Secrets and variables → Actions → Variables*.  The Lean job needs
+`ENABLE_LEAN` set to `true` as well, since a first mathlib build downloads
+several gigabytes.
 
 ## License
 

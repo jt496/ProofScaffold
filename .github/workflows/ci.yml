@@ -5,10 +5,35 @@ on:
   pull_request:
   workflow_dispatch:
 
+# ---------------------------------------------------------------------------
+# Actions minutes are free on public repositories and metered on private ones.
+# A project started from this template is usually private, and a proof search
+# pushes often, so every job below is gated: it runs automatically only when
+# the repository is public.
+#
+# On a private repository nothing runs and nothing is billed -- a job skipped
+# by `if` never allocates a runner. Build locally with `make all` instead; it
+# is the same set of checks, and AGENTS.md already requires it before work is
+# called done.
+#
+# Two escape hatches: run it by hand from the Actions tab (workflow_dispatch),
+# or set the repository variable ENABLE_CI to `true`
+# (Settings -> Secrets and variables -> Actions -> Variables) to turn automatic
+# runs back on while staying private.
+#
+# The condition is repeated on each job rather than computed once, because a
+# job that computes it would itself cost a billable minute on every push --
+# GitHub rounds each job up to the minute -- which is the cost we are avoiding.
+# ---------------------------------------------------------------------------
+
 jobs:
   manuscript:
     name: manuscript and checks
     runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      || github.event.repository.private == false
+      || vars.ENABLE_CI == 'true'
     steps:
       - uses: actions/checkout@v5
 
@@ -34,6 +59,10 @@ jobs:
   tools:
     name: computational audit
     runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      || github.event.repository.private == false
+      || vars.ENABLE_CI == 'true'
     steps:
       - uses: actions/checkout@v5
       # Every program here exits non-zero on failure and prints a pass/fail
@@ -44,9 +73,13 @@ jobs:
   formal:
     name: lean
     runs-on: ubuntu-latest
-    # Opt-in: a first mathlib build downloads several gigabytes.  Set the
-    # repository variable ENABLE_LEAN to `true` once formal/ is in use.
-    if: vars.ENABLE_LEAN == 'true'
+    # Opt-in twice over: the gate above, and ENABLE_LEAN, because a first
+    # mathlib build downloads several gigabytes.
+    if: >-
+      (github.event_name == 'workflow_dispatch'
+       || github.event.repository.private == false
+       || vars.ENABLE_CI == 'true')
+      && vars.ENABLE_LEAN == 'true'
     steps:
       - uses: actions/checkout@v5
 
