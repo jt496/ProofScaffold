@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Refuse to push a tree that does not build.
+#
+# Activated per clone with
+#     git config core.hooksPath .githooks
+# which is why this lives in a tracked directory: .git/hooks is not cloned, so
+# a hook kept there exists only on the machine that wrote it.
+#
+# This is the private-repository substitute for CI. `make all` builds the six
+# PDFs and runs every consistency check, and takes seconds once the build tree
+# is warm, so it is cheap enough to run on every push.
+#
+# Bypass deliberately with `git push --no-verify`.
+set -uo pipefail
+
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
+# Nothing to check when every ref being pushed is a deletion.
+all_deletes=1
+while read -r _local_ref local_sha _remote_ref _remote_sha; do
+    [ -n "${local_sha:-}" ] || continue
+    case "$local_sha" in
+        *[!0]*) all_deletes=0 ;;
+    esac
+done
+[ "$all_deletes" -eq 1 ] && exit 0
+
+if [ -n "$(git status --porcelain)" ]; then
+    echo "pre-push: working tree is dirty; the checks below run against the" >&2
+    echo "          working tree, not against the commits being pushed." >&2
+fi
+
+echo "pre-push: make all"
+if ! make all; then
+    echo >&2
+    echo "pre-push: 'make all' failed, so the push was refused." >&2
+    echo "          Fix it and push again, or bypass with --no-verify." >&2
+    exit 1
+fi

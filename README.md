@@ -42,6 +42,7 @@ manuscript label, and a note explaining what the refutation rules out.
 git clone <this repo> MyConjecture && cd MyConjecture
 make init                      # name the project; replaces the worked example
 make all                       # six PDFs, then every consistency check
+git config core.hooksPath .githooks   # refuse pushes that do not build
 ```
 
 `make init` asks for a project name, a title and authors, and rewrites three
@@ -164,6 +165,21 @@ formal/
   Scaffold/          Basic, Results/, and a Tests/ module per result
 
 ```
+
+## Local checks before a push
+
+`.githooks/pre-push` refuses a push whose tree does not build.  Activate it
+once per clone:
+
+```sh
+git config core.hooksPath .githooks
+```
+
+It lives in a tracked directory because `.git/hooks` is not cloned, so a hook
+kept there would exist only on the machine that wrote it.  On a private
+repository this is the substitute for CI: it costs no Actions minutes, and
+`make all` takes seconds once the build tree is warm.  Bypass it deliberately
+with `git push --no-verify`.
 
 ## Continuous integration
 

@@ -100,8 +100,51 @@ is evidence it is not yet a fact — say so in the session summary instead.
 Your own cross-session memory, if you have one, is a different thing and is
 yours to keep.  Do not mirror it into the repository.
 
-## Git
+## Committing and pushing
 
-Small commits, one idea each.  Say what changed and why in the message, not
-just which files.  Do not rewrite published history, and do not push unless
-asked.
+You may be left running for hours or days with nobody watching. The commit
+history is how your supervisor follows that from somewhere else, so it has to
+be readable *as it happens*, not reconstructed at the end.
+
+**Commit when a unit of work is complete and the checks pass** — not on a
+timer, and not once at the end of a long session. A unit is one of:
+
+* a statement written up with its proof, and the manifests updated;
+* a route advanced, a target restated, or a reduction recorded;
+* a refutation, together with its witness, its program and its retained log;
+* a Lean module and its `Tests/` module, building clean, with the blueprint
+  row;
+* a tool, together with the log of the run it was written for.
+
+**Push after every commit.** Work that has not left the machine does not exist
+as far as anyone else is concerned, and the point of pushing continuously is
+that the run can be followed, and picked up, from somewhere else. If a push
+fails, stop and say so in your next message: do not keep piling commits on top
+of work that is not leaving the machine.
+
+**Never commit a tree that does not build.** Run `make all` first. The
+`pre-push` hook runs it again and refuses the push if it fails, but do not use
+the hook as the check — by then you have already written the commit message.
+
+**There are no work-in-progress commits here, and you never need one.**
+Incomplete work has a legitimate home: an argument that is not finished is a
+route, not a broken result. Write the partial argument into `tex/routes/`,
+honestly labelled as far as it goes, and commit that. It is a real
+contribution, it builds, and it says something true. Committing a half-written
+proof into `tex/results/` to save progress is the one thing that corrupts the
+record, because the results edition is meant to be the part a reader can trust
+without checking.
+
+**Before a long computation, commit first.** Commit the program and the exact
+command you are about to run, then commit the log when it finishes. If the run
+dies, or you do, the record of what was attempted survives.
+
+**Commit before switching approach.** When you abandon a line of attack, that
+is a commit — even when the outcome is negative, and especially then.
+
+**Do not batch a day's work into one commit.** The order in which things were
+tried, and what was known when, is part of the record. A single enormous commit
+at the end throws it away.
+
+Write the message so it says what changed and why, not which files changed —
+`git diff` already knows the files. Do not rewrite published history.
