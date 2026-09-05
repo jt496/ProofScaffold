@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  manuscript:
+    name: manuscript and checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install TeX Live
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            texlive-latex-recommended texlive-latex-extra \
+            texlive-fonts-recommended latexmk
+
+      # `make all` builds the six PDFs and then runs every consistency check:
+      # labels, ownership, manifests, glossary, and the LaTeX logs.
+      - name: Build and check
+        run: make all
+
+      - name: Upload PDFs
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdfs
+          path: output/pdf/
+          if-no-files-found: error
+
+  tools:
+    name: computational audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Every program here exits non-zero on failure and prints a pass/fail
+      # line, so this job needs no human reading its output.
+      - name: Build and audit
+        run: make audit CXXFLAGS='-O2 -std=c++17 -Wall'
+
+  formal:
+    name: lean
+    runs-on: ubuntu-latest
+    # Opt-in: a first mathlib build downloads several gigabytes.  Set the
+    # repository variable ENABLE_LEAN to `true` once formal/ is in use.
+    if: vars.ENABLE_LEAN == 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elan
+        run: |
+          curl -sSfL https://github.com/leanprover/elan/releases/latest/download/elan-x86_64-unknown-linux-gnu.tar.gz \
+            | tar xz
+          ./elan-init -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Fetch mathlib cache
+        run: lake exe cache get
+
+      - name: Build
+        run: lake build

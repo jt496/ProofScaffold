@@ -1,0 +1,33 @@
+\section{Closed: two distinct primes}\label{sec:distinct}
+
+The obvious strengthening of Conjecture~\ref{goldbach:conj} asks for the two
+primes to be distinct.  It is false, and the counterexamples are the two
+smallest cases.  It is recorded here, in the companion, rather than deleted:
+a closed route keeps its exact failure mode searchable, and the corrected form
+is what any later argument should quote.
+
+\begin{prop}\label{distinct:counter}
+There is no \term{goldbach-pair} $(p,q)$ with $p\neq q$ for $n=4$ or $n=6$.
+For every even $n$ with $8\leq n\leq10^{6}$ such a pair does exist.
+\end{prop}
+
+\begin{proof}
+For $n=4$ the only pair of primes summing to $4$ is $(2,2)$, since $3$ is prime
+but $1$ is not.  For $n=6$ the candidates are $(2,4)$ and $(3,3)$, and $4$ is
+not prime, so only $(3,3)$ survives.  Both fail the distinctness requirement.
+The positive range is the output of
+\begin{verbatim}
+    python3 tools/python/distinct_goldbach.py 1000000
+\end{verbatim}
+which applies Lemma~\ref{reflect:lem} with the diagonal $p=n/2$ removed; the
+retained output is \texttt{tools/logs/distinct-primes-1e6.log}.
+\end{proof}
+
+\emph{Why it fails, and what survives.}  The obstruction is not arithmetic but
+trivial: the diagonal pair is available exactly when $n/2$ is prime, and for
+$n\in\{4,6\}$ it is the only pair there is.  The statement is therefore true
+for all $n\geq8$, and it is that corrected form, not the original, which should
+be carried forward if the strengthening is ever needed.  The \term{sifted-count}
+of Definition~\ref{sifted:def} is insensitive to the diagonal, so no
+sieve-theoretic route would have detected this failure --- which is the reason
+the check was run at all.

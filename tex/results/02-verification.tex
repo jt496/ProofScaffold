@@ -1,0 +1,47 @@
+\section{Finite verification}\label{sec:verify}
+
+\begin{lemma}\label{small:lem}
+Every even $n$ with $4\leq n\leq12$ is a \term{goldbach-number}.
+\end{lemma}
+
+\begin{proof}
+$4=2+2$, $6=3+3$, $8=3+5$, $10=3+7$ and $12=5+7$.
+\end{proof}
+
+Lemma~\ref{small:lem} is the range that has additionally been verified by
+machine: it is \texttt{Scaffold.Results.goldbach\_small} in the Lean
+development, and the correspondence is recorded in
+\texttt{formal/BLUEPRINT.md}.
+
+\begin{theorem}\label{verify:thm}
+Every even $n$ with $4\leq n\leq10^{8}$ is a \term{goldbach-number}.  Moreover
+the least prime summand never exceeds $1093$ in that range, and $1093$ is
+attained at $n=60\,119\,912$.
+\end{theorem}
+
+\begin{proof}
+By Corollary~\ref{even:cor} it suffices, for each even $n$ in range, to exhibit
+a prime $p\leq n-2$ with $n-p$ prime.  The program
+\texttt{tools/cpp/goldbach.cpp} sieves $[0,10^{8}]$ once and then evaluates the
+intersection of Lemma~\ref{reflect:lem} for each even $n$ in turn, stopping at
+the first witness and recording the largest witness required.  Running
+\begin{verbatim}
+    make -C tools/cpp && tools/cpp/goldbach 100000000
+\end{verbatim}
+reports no failure and the stated record; the retained output is
+\texttt{tools/logs/goldbach-1e8.log}.  The search is exhaustive over the range,
+not a sample: every even $n$ in $[4,10^{8}]$ is tested, and the early stop
+discards only the further witnesses for an $n$ already known to be a Goldbach
+number.
+\end{proof}
+
+The \termas{sieve}{sieve of Eratosthenes} is the only nontrivial ingredient,
+and the bound is limited by memory rather than by time: the whole range takes
+under a second, and the sieve is one byte per integer.
+
+The \term{goldbach-count} itself is more expensive, since it needs every
+witness rather than the first, so it is computed only over a short initial
+range: \texttt{tools/cpp/goldbach 1000000 -{}-counts 20000} gives
+$\min\{\gc(n):4\leq n\leq20000\}=1$, attained exactly at $n\in\{4,6\}$: the
+only two integers in that range whose sole representation is the diagonal one
+$n=(n/2)+(n/2)$.

@@ -1,0 +1,36 @@
+# LaTeX build products
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
+build/
+tmp/
+
+# Lean
+.lake/
+
+# Released PDFs are build products: `make all` writes all six.  Tracking them
+# costs about 1 MB of history per rebuild, which dominates a text repository
+# within a few months.  Anything meant to be sent to a reader goes in
+# output/standalone/ instead, which is tracked.
+output/pdf/
+
+# editing snapshots
+*.bak
+*.bak[0-9]
+*.bak[0-9][0-9]
+
+# compiled tools: rebuilt by tools/cpp/Makefile, not tracked
+tools/cpp/*
+!tools/cpp/*.cpp
+!tools/cpp/*.hpp
+!tools/cpp/*.txt
+!tools/cpp/Makefile
+
+__pycache__/
+*.pyc

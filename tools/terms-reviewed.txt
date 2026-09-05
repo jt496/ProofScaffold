@@ -1,0 +1,8 @@
+# Sweep candidates reviewed and left without a glossary row.
+#
+# tools/python/undefined_terms.py reports project-coined vocabulary that the
+# manuscript never defines.  Its output is candidates, not a verdict, and the
+# terms below have been read and judged not to need a row.  The script excludes
+# them, so a later run reports only vocabulary coined since the last pass.
+#
+# Delete a line to have the sweep raise that term again.

@@ -1,0 +1,28 @@
+% The single document body.  Every edition inputs this file; they differ only
+% in which of \SCAFFOLDResultsView / \SCAFFOLDRoutesView / \SCAFFOLDArchiveView
+% is defined, which selects a frontmatter and a manifest.
+\input{tex/preamble}
+\input{tex/metadata}
+
+\begin{document}
+\ifdefined\SCAFFOLDResultsView
+  \input{tex/frontmatter/results}
+\else\ifdefined\SCAFFOLDRoutesView
+  \input{tex/frontmatter/routes}
+\else
+  \input{tex/frontmatter/archive}
+\fi\fi
+
+\tableofcontents
+\clearpage
+
+\input{tex/glossary}
+
+\ifdefined\SCAFFOLDResultsView
+  \input{tex/manifests/results}
+\else\ifdefined\SCAFFOLDRoutesView
+  \input{tex/manifests/routes}
+\else
+  \input{tex/manifests/archive}
+\fi\fi
+\end{document}

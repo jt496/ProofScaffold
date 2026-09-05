@@ -1,0 +1,40 @@
+\section{Elementary tools}\label{sec:tools}
+
+\begin{lemma}\label{lower:lem}
+Every \term{goldbach-number} is at least $4$.
+\end{lemma}
+
+\begin{proof}
+If $n=p+q$ with $p,q\in\Prset$ then $p\geq2$ and $q\geq2$, so $n\geq4$.
+\end{proof}
+
+The next lemma is the only tool the computations use.  It replaces the search
+over ordered pairs by a single set intersection, so that a sieve computed once
+answers the question for every $n$ in range.
+
+\begin{lemma}\label{reflect:lem}
+For $n\geq4$, the integer $n$ is a \term{goldbach-number} if and only if
+\[
+  \Prset\cap(n-\Prset)\ \neq\ \emptyset ,
+\]
+where $n-\Prset=\{n-p:p\in\Prset,\ p\leq n\}$.  Moreover
+$\gc(n)=|\Prset\cap(n-\Prset)|$.
+\end{lemma}
+
+\begin{proof}
+If $(p,q)$ is a \term{goldbach-pair} for $n$ then $p\in\Prset$ and
+$p=n-q\in n-\Prset$, so $p$ lies in the intersection.  Conversely, if
+$p\in\Prset\cap(n-\Prset)$ then $p=n-q$ for some prime $q\leq n$, and $(p,q)$
+is a Goldbach pair.  The two constructions are mutually inverse and preserve
+the first coordinate, so they biject the Goldbach pairs for $n$ with the
+elements of the intersection, giving the count.
+\end{proof}
+
+\begin{cor}\label{even:cor}
+Conjecture~\ref{goldbach:conj} holds for $n$ if and only if some prime
+$p\leq n-2$ has $n-p$ prime.
+\end{cor}
+
+\begin{proof}
+Immediate from Lemma~\ref{reflect:lem} together with $q\geq2$.
+\end{proof}

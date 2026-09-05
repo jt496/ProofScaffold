@@ -1,0 +1,1 @@
+- [Distinct-primes strengthening refuted](goldbach-distinct-refuted.md) — fails exactly at n = 4 and 6; the obstruction is the diagonal pair, invisible to sieves.

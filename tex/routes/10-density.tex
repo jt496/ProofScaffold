@@ -1,0 +1,49 @@
+\section{The sieve lower bound}\label{sec:density}
+
+The quantitative route to Conjecture~\ref{goldbach:conj} replaces the
+existence question by a counting one.  By Lemma~\ref{reflect:lem} the
+\term{goldbach-count} is the size of a set intersection, so any lower bound on
+that size that is eventually positive settles the conjecture for all large $n$,
+leaving a finite range covered by Theorem~\ref{verify:thm}.
+
+\begin{definition}\label{sifted:def}
+For even $n$ and a parameter $z\geq2$, the \dfnas{sifted-count}{sifted count}
+$\gc_{z}(n)$ is the number of $p\leq n$ such that neither $p$ nor $n-p$ has a
+prime factor below $z$.
+\end{definition}
+
+Sieve methods bound $\gc_{z}(n)$ from above and below for $z$ a small power of
+$n$, and $\gc(n)\leq\gc_{z}(n)$ for every $z$, which is the wrong direction.
+The route is therefore to control the difference.
+
+\begin{prob}\label{density:prob}
+Show that there is a constant $c>0$ with
+\[
+  \gc(n)\ \geq\ \frac{c\,n}{(\log n)^{2}}
+\]
+for every sufficiently large even $n$.
+\end{prob}
+
+A positive answer implies Conjecture~\ref{goldbach:conj} for all large $n$,
+and hence, with Theorem~\ref{verify:thm}, in every range that has been checked
+below the implied threshold.
+
+\begin{prop}\label{upper:prop}
+The bound of Problem~\ref{density:prob} is of the correct order: there is a
+constant $C$ with $\gc(n)\leq C\,n/(\log n)^{2}$ for every even $n\geq4$.
+\end{prop}
+
+\begin{proof}[Proof sketch]
+This is the standard upper-bound sieve applied to the sequence
+$\{p(n-p)\}$; it is classical, and is recorded here only to fix the shape of
+the target.  A complete proof is not reproduced, so this statement stays in the
+companion rather than the results edition.
+\end{proof}
+
+\emph{Why the parity obstruction bites.}  A pure sieve cannot distinguish
+numbers with an even number of prime factors from those with an odd number, and
+the \term{sifted-count} counts both.  Any argument that resolves
+Problem~\ref{density:prob} must therefore import information beyond the sieve
+axioms; the \termas{hardy-littlewood}{Hardy--Littlewood} heuristic predicts the
+constant but supplies no such input.  Numerical support is in
+\texttt{tools/python/goldbach\_counts.py}.

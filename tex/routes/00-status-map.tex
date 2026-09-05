@@ -1,0 +1,31 @@
+\section{Current status and route map}\label{sec:status}
+
+This table is the maintained route index, and the only place in the project
+where the status of a programme is asserted.  ``Open'' means the displayed
+target is sufficient but unproved; ``closed'' means an exact counterexample to
+it is recorded in the archive.  Do not repeat status prose in abstracts,
+introductions or computational notes: update this table instead.
+
+\begingroup
+\small
+\renewcommand{\arraystretch}{1.12}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.22\textwidth}
+                       >{\raggedright\arraybackslash}p{0.48\textwidth}
+                       >{\raggedright\arraybackslash}p{0.18\textwidth}@{}}
+\textbf{Programme} & \textbf{Current target} & \textbf{State}\\ \hline
+\endfirsthead
+\textbf{Programme} & \textbf{Current target} & \textbf{State}\\ \hline
+\endhead
+Sieve lower bound &
+Problem~\ref{density:prob}: a lower bound $\gc(n)\gg n/(\log n)^{2}$ for even
+$n$, which implies Conjecture~\ref{goldbach:conj} for all large $n$.  The
+upper bound of the same shape is classical; only the lower bound is missing. &
+open; priority 1\\
+Exhaustive verification &
+Extend Theorem~\ref{verify:thm} beyond $10^{8}$; bounded by memory, not time. &
+proved to $10^{8}$\\
+Two distinct primes &
+Every even $n\geq4$ is a sum of two \emph{distinct} primes. &
+closed by Proposition~\ref{distinct:counter}\\
+\end{longtable}
+\endgroup

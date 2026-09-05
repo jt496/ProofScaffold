@@ -1,0 +1,26 @@
+\section{Introduction}\label{sec:intro}
+
+Write $\Prset$ for the set of primes.
+
+\begin{conjecture}[Goldbach]\label{goldbach:conj}
+Every even integer $n\geq4$ is a sum of two primes.
+\end{conjecture}
+
+\begin{definition}\label{pair:def}
+A \dfnas{goldbach-pair}{Goldbach pair} for $n$ is an ordered pair $(p,q)$ of
+primes with $p+q=n$.  An integer admitting at least one such pair is a
+\dfnas{goldbach-number}{Goldbach number}, and the number of pairs it admits is
+its \dfnas{goldbach-count}{Goldbach count} $\gc(n)$.
+\end{definition}
+
+In this language Conjecture~\ref{goldbach:conj} says that $\gc(n)\geq1$ for
+every even $n\geq4$, and the natural quantitative strengthening --- that
+$\gc(n)$ grows --- is the subject of the route in the companion edition.
+
+This edition records three established statements.
+Lemma~\ref{lower:lem} bounds a Goldbach number from below;
+Lemma~\ref{reflect:lem} reduces the existence of a Goldbach pair to a set
+intersection, which is what every computation here actually evaluates; and
+Theorem~\ref{verify:thm} is the finite verification for $n\leq10^{8}$.
+The initial range $n\leq12$ of that verification has additionally been checked
+by machine, in Lean; see \texttt{formal/BLUEPRINT.md}.

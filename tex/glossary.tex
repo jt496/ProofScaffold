@@ -1,0 +1,101 @@
+% Shared reference sheet, included by all three editions.  Every row names a
+% term or symbol, states what it means in one line, and points at the place
+% where it is properly defined; that pointer is a live link, and in the
+% companion editions it leads into the results PDF through xr-hyper.
+%
+% A row's first cell carries the anchor planted by the \gkey macro: writing
+% \term with the same key in the body turns that occurrence into a link to this
+% table.  Keep the rows in alphabetical order, and keep every \gkey key matched
+% by exactly one \dfn in the body.
+%
+% A row whose pointer is a companion-owned label must be gated with
+%   \ifdefined\SCAFFOLDResultsView\else ... \fi
+% or the results edition fails on an undefined reference.  A gated row must not
+% be linked from a results module; tools/check_manuscript.pl checks both.
+
+\phantomsection
+\section*{Terminology and notation}
+\addcontentsline{toc}{section}{Terminology and notation}
+
+Each entry below is defined once in the body, at the place named in the last
+column; the definition there is the authoritative one, and what is recorded
+here is only enough to read on with.  Terms set in blue elsewhere in the text
+link to their row in the first table.
+
+\subsection*{Terminology}
+
+\begingroup
+\setlength{\LTleft}{0pt}\setlength{\LTright}{0pt}
+\renewcommand{\arraystretch}{1.25}
+\begin{longtable}{@{}p{0.24\textwidth}p{0.505\textwidth}p{0.165\textwidth}@{}}
+\hline
+\textbf{Term} & \textbf{Meaning} & \textbf{Defined in}\\
+\hline
+\endhead
+\hline
+\endfoot
+
+\gkey{goldbach-count}{Goldbach count} &
+The number $\gc(n)$ of Goldbach pairs for $n$; equivalently, by
+Lemma~\ref{reflect:lem}, the size of $\Prset\cap(n-\Prset)$. &
+Def.~\ref{pair:def}\\
+
+\gkey{goldbach-number}{Goldbach number} &
+An integer admitting at least one Goldbach pair.  Conjecture~\ref{goldbach:conj}
+says every even $n\geq4$ is one. &
+Def.~\ref{pair:def}\\
+
+\gkey{goldbach-pair}{Goldbach pair} &
+An ordered pair $(p,q)$ of primes with $p+q=n$.  Ordered, so $(3,5)$ and
+$(5,3)$ are two pairs for $8$. &
+Def.~\ref{pair:def}\\
+
+\ifdefined\SCAFFOLDResultsView\else
+\gkeyx{hardy-littlewood}{Hardy--Littlewood} &
+The conjectural asymptotic $\gc(n)\sim2\Pi_{2}\,n/(\log n)^{2}$ times a
+singular series depending on the odd prime factors of $n$.  Used only as a
+heuristic; nothing in this project depends on it. &
+\S\ref{sec:density}\\
+\fi
+
+\gkeyx{sieve}{sieve of Eratosthenes} &
+The linear-time marking of composites in $[0,N]$ used by every computation
+here.  Standard; stated nowhere in the body. &
+\S\ref{sec:verify}\\
+
+\ifdefined\SCAFFOLDResultsView\else
+\gkey{sifted-count}{sifted count} &
+The count $\gc_{z}(n)$ of $p\leq n$ with neither $p$ nor $n-p$ divisible by a
+prime below $z$.  An upper bound for $\gc(n)$, which is the wrong direction. &
+Def.~\ref{sifted:def}\\
+\fi
+
+\end{longtable}
+\endgroup
+
+\subsection*{Notation}
+
+\begingroup
+\setlength{\LTleft}{0pt}\setlength{\LTright}{0pt}
+\renewcommand{\arraystretch}{1.25}
+\begin{longtable}{@{}p{0.24\textwidth}p{0.505\textwidth}p{0.165\textwidth}@{}}
+\hline
+\textbf{Symbol} & \textbf{Meaning} & \textbf{Defined in}\\
+\hline
+\endhead
+\hline
+\endfoot
+
+$\Prset$ & The set of primes. & \S\ref{sec:intro}\\
+
+$n-\Prset$ & $\{n-p:p\in\Prset,\ p\leq n\}$, the reflection of the primes in
+$n/2$. & Lem.~\ref{reflect:lem}\\
+
+$\gc(n)$ & The Goldbach count of $n$. & Def.~\ref{pair:def}\\
+
+\ifdefined\SCAFFOLDResultsView\else
+$\gc_{z}(n)$ & The sifted count of $n$ at level $z$. & Def.~\ref{sifted:def}\\
+\fi
+
+\end{longtable}
+\endgroup

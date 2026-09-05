@@ -1,0 +1,26 @@
+\section{Superseded: verification by hand}\label{sec:hand}
+
+Before \texttt{tools/cpp/goldbach.cpp} existed, the verified range was
+$n\leq1000$, obtained by the argument below.  Theorem~\ref{verify:thm}
+supersedes it completely.  It is kept because the method, not the range, is
+what may be worth reusing: it needs no sieve, and it generalises to any
+sufficiently dense set of summands.
+
+\begin{prop}\label{hand:prop}
+Every even $n$ with $4\leq n\leq1000$ is a \term{goldbach-number}.
+\end{prop}
+
+\begin{proof}[Proof as originally given]
+Let $Q=\{3,5,7,11,13,17,19,23,29,31\}$.  For each even $n$ in range one checks
+that some $q\in Q$ has $n-q$ prime; the verification is a table of $499$ rows,
+which was checked by hand and is not reproduced.  The choice of $Q$ is not
+canonical --- any set of small primes whose reflections cover the range will
+do --- and it is exactly this arbitrariness that the sieve argument removes.
+\end{proof}
+
+\emph{Why it was replaced.}  The table does not scale, and its correctness
+rests on a reader's patience rather than on anything checkable.  The
+replacement is stronger in three ways: the range is $10^{5}$ times larger, the
+witness bound of Theorem~\ref{verify:thm} is a genuine statistic rather than an
+artefact of the chosen $Q$, and the computation is reproducible by one command.
+That is the standard a computational claim in this project is held to.

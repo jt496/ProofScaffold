@@ -1,0 +1,16 @@
+# Emphasis that is deliberately not a glossary entry.
+#
+# tools/check_manuscript.pl requires every \emph{...} in a content module to be
+# either a \dfn (a term with a row in tex/glossary.tex) or listed here.  That is
+# what stops new terminology entering the manuscript undocumented: a new
+# emphasised term fails the build until it is either given a glossary row or
+# acknowledged below.
+#
+# Add a term here when it is confined to one module, so that its definition is
+# always a few lines from every use.  Promote it to tex/glossary.tex when a
+# second module starts using it.  Run-in headers (a capitalised phrase ending
+# in a full stop) and \emph containing \ref are skipped automatically and need
+# no entry.
+
+# --- ordinary stress, not terminology --------------------------------------
+distinct

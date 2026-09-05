@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(make:*)",
+      "Bash(latexmk:*)",
+      "Bash(lake build)",
+      "Bash(lake env lean:*)",
+      "Bash(perl tools/check_manuscript.pl)",
+      "Bash(python3 tools/python/*)",
+      "Bash(tools/cpp/*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(rg:*)"
+    ]
+  }
+}

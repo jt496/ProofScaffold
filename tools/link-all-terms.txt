@@ -1,0 +1,19 @@
+# Terms whose *every* occurrence may be linked, for the densely linked editions.
+#
+# tools/python/link_all.py reads this file and links only the terms listed
+# here; everything else keeps the one-link-per-module treatment that the three
+# ordinary editions use.  The list is deny-by-default on purpose: a term earns
+# a place only when nearly every occurrence really is the technical sense.
+# Sample the occurrences before promoting one -- an ordinary English word
+# pressed into technical service (`support`, `full`, `side`, `free`) will turn
+# a page blue for no gain.
+#
+# Format:  key: printed form, other form, ...
+# The key must have a glossary row (make check enforces this).  Longer forms
+# are matched before shorter ones, and the per-occurrence veto rules in
+# link_all.py still apply.
+
+goldbach-pair: Goldbach pairs, Goldbach pair
+goldbach-number: Goldbach numbers, Goldbach number
+goldbach-count: Goldbach counts, Goldbach count
+sifted-count: sifted counts, sifted count

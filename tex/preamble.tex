@@ -1,0 +1,108 @@
+% ---------------------------------------------------------------------------
+% Shared preamble for every edition.  Which edition is being built is decided
+% by the entry point in tex/editions/, which defines exactly one of
+% \SCAFFOLDResultsView, \SCAFFOLDRoutesView, \SCAFFOLDArchiveView before
+% inputting tex/document.tex.
+% ---------------------------------------------------------------------------
+\documentclass[12pt]{article}
+
+% Labels stay visible in the two working editions, because console and chat
+% conversation about the project refers to LaTeX keys.  The results edition
+% omits them for publication-style reading.
+\ifdefined\SCAFFOLDShowKeys
+  \usepackage[notcite,notref]{showkeys}
+  % Long descriptive keys otherwise run past the physical page edge.
+  \renewcommand*\showkeyslabelformat[1]{%
+    \fbox{\normalfont\scriptsize\ttfamily#1}}
+\fi
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{array}
+\usepackage{longtable}
+\ifdefined\SCAFFOLDRoutesView
+  \usepackage{xr-hyper}
+\fi
+% xcolor before hyperref: \termx uses the colour name `.', meaning the current
+% colour, so a subsequent-occurrence link inherits the surrounding text.
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+% --- project notation ------------------------------------------------------
+% Keep macros here rather than in the modules, so that a change of notation is
+% one edit and every edition agrees.
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Prset}{\mathbb{P}}          % the primes
+\newcommand{\gc}{g}                      % the Goldbach count
+% ---------------------------------------------------------------------------
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{cor}[theorem]{Corollary}
+\newtheorem{prop}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{prob}[theorem]{Problem}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{plain}
+
+\renewcommand{\baselinestretch}{1.15}
+\emergencystretch=1em
+\setcounter{tocdepth}{1}
+
+% The routes companion refers to labels owned by the results edition, so the
+% Makefile builds the results edition first.  Which results auxiliary to read is
+% a parameter, because the plain and linked variants are built into different
+% directories and each must import its own: a link in the linked routes PDF has
+% to land in the linked results PDF.
+\ifdefined\SCAFFOLDRoutesView
+  \ifdefined\SCAFFOLDResultsAux\else
+    \def\SCAFFOLDResultsAux{build/plain/results/scaffold-results}
+  \fi
+  % Labels are read from the build tree, but the link must point at the released
+  % sibling: output/pdf/{plain,linked}/ holds scaffold-results.pdf next to
+  % scaffold-routes.pdf.  Without the explicit URL, xr-hyper defaults the target
+  % to the build path, which does not exist relative to the released PDF, and
+  % every cross-document link silently goes nowhere.
+  \def\SCAFFOLDimportresults#1{\externaldocument{#1}[scaffold-results.pdf]}
+  \expandafter\SCAFFOLDimportresults\expandafter{\SCAFFOLDResultsAux}
+\fi
+
+% ---------------------------------------------------------------------------
+% Terminology apparatus.  A term is marked \dfn{goldbach pair} at the single
+% place where it is defined, and \term{goldbach pair} at the first use in every
+% other module; the latter links to the term's row in tex/glossary.tex, which
+% points on to the defining section or result.  Because the glossary is included
+% by all three editions, \term always resolves, even when the definition is
+% owned by another edition and reached through xr-hyper.  Use \dfnas/\termas
+% when the printed form differs from the key (plurals, symbols, inflections).
+% ---------------------------------------------------------------------------
+\newcommand{\dfnas}[2]{\hypertarget{term:#1}{}\emph{#2}}
+\newcommand{\dfn}[1]{\dfnas{#1}{#1}}
+\newcommand{\termas}[2]{\hyperlink{gloss:#1}{#2}}
+\newcommand{\term}[1]{\termas{#1}{#1}}
+
+% \termx marks a *subsequent* occurrence of a term.  It is a no-op unless the
+% edition defines \SCAFFOLDLinkAll, and even then it renders the word in the
+% running text colour rather than in blue: the link is there for a reader who
+% wants it, without turning one word in twenty into a coloured link.
+% Occurrences are written by tools/python/link_all.py at build time, never by
+% hand.
+\ifdefined\SCAFFOLDLinkAll
+  \newcommand{\termx}[2]{\begingroup\hypersetup{linkcolor=.}%
+    \hyperlink{gloss:#1}{#2}\endgroup}
+\else
+  \newcommand{\termx}[2]{#2}
+\fi
+
+% First cell of a glossary row: the anchor that \term jumps to.  \gkey marks a
+% term that the body defines, and whose key must be matched by exactly one
+% \dfn; \gkeyx marks one the glossary itself defines, for the synonyms, method
+% names and imported notions the text uses without ever stopping to introduce
+% them.
+\newcommand{\gkey}[2]{\hspace{0pt}\textbf{#2}\hypertarget{gloss:#1}{}}
+\newcommand{\gkeyx}[2]{\gkey{#1}{#2}}
