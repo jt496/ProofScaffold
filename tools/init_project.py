@@ -537,14 +537,16 @@ tools/cpp/example 10
     # The Goldbach-specific notation block in the preamble.
     pre = ROOT / 'tex' / 'preamble.tex'
     text = pre.read_text()
+    notation = (
+        '% --- project notation '
+        + '-' * 56 + '\n'
+        '% Keep macros here rather than in the modules, so that a change of '
+        'notation is\n% one edit and every edition agrees.\n'
+        '\\newcommand{\\N}{\\mathbb{N}}\n'
+        '\\newcommand{\\R}{\\mathbb{R}}\n'
+        '% ' + '-' * 75 + '\n')
     text = re.sub(r'(?s)% --- project notation.*?% -{20,}\n',
-                  '''% --- project notation ------------------------------------------------------
-% Keep macros here rather than in the modules, so that a change of notation is
-% one edit and every edition agrees.
-\\newcommand{\\N}{\\mathbb{N}}
-\\newcommand{\\R}{\\mathbb{R}}
-% ---------------------------------------------------------------------------
-''', text)
+                  lambda _m: notation, text)
     pre.write_text(text)
 
     (ROOT / 'tools' / 'logs' / '.gitkeep').touch()
@@ -631,15 +633,18 @@ def main():
         strip_template_section()
 
     print(f'{changed} files rewritten, {renamed} paths renamed.')
+    where = ('the worked example under tex/results/ and tex/routes/, which you '
+             'can now\nedit or delete'
+             if keep else
+             'tex/results/00-introduction.tex, and put your first target in\n'
+             'tex/routes/10-first-route.tex')
     print(f"""
 Next:
 
     make all            # six PDFs and every check; should pass as-is
     git add -A && git commit -m 'Initialise {camel}'
 
-Then read MANUSCRIPT.md, write your conjecture into
-tex/results/00-introduction.tex, and put your first target in
-tex/routes/10-first-route.tex.""")
+Then read MANUSCRIPT.md, write your conjecture into {where}.""")
     return 0
 
 
