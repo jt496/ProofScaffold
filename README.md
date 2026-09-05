@@ -45,6 +45,12 @@ make all                       # six PDFs, then every consistency check
 git config core.hooksPath .githooks   # refuse pushes that do not build
 ```
 
+One thing to keep in mind as the project grows: this README should describe the
+*shape* of the repository, not the *state* of the work.  Resist putting a list
+of what is proved, or a count of open routes, at the top of it — that is a
+second account of something the route table already maintains, and it is always
+the stale copy that a newcomer reads first.
+
 `make init` asks for a project name, a title and authors, and rewrites three
 placeholder tokens through the whole tree:
 

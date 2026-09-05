@@ -41,7 +41,11 @@ the structural reason to `tex/archive/40-computations.tex` when the failure
 rules out more than the one route.
 
 **Status is asserted in exactly one place**, the route table.  Do not restate
-it in an abstract, an introduction, or a computational remark.
+it in an abstract, an introduction, or a computational remark. `README.md` describes the shape of the
+project, not its state: if you find yourself writing a count, a list of results
+or a "currently" into it, that belongs in the route table instead, and nowhere
+else. The same goes for a formalisation total — `formal/BLUEPRINT.md` is where
+that is maintained.
 
 **Do not edit generated files.**  `build/` and `build/linked-src/` are outputs;
 never hand-write `\termx`.  Re-run `tools/python/link_all.py`.
