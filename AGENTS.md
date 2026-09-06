@@ -47,12 +47,34 @@ or a "currently" into it, that belongs in the route table instead, and nowhere
 else. The same goes for a formalisation total — `formal/BLUEPRINT.md` is where
 that is maintained.
 
+**Keep the abstracts in step with the problem.**  The three frontmatter
+abstracts state what the project is about and what each edition is for.  When
+the problem is first set, or is materially restated --- a reduction becomes the
+real target, the hypothesis changes --- update all three in the same commit.
+The results abstract is one of the two maintained accounts of what is
+established, so it summarises what is proved; it must not carry route status,
+priorities or counts, which belong in the route table and nowhere else.
+
 **Do not edit generated files.**  `build/` and `build/linked-src/` are outputs;
 never hand-write `\termx`.  Re-run `tools/python/link_all.py`.
 
 **Do not recreate a retired entry point.**  The six editions are the only
 supported manuscripts.  Old assembly or migration scripts under `tools/`, if
 any, are historical aids and must never be used to regenerate one.
+
+**Ask before formalizing anything in Lean.**  Formalisation is expensive --- a
+single lemma can cost more than finding its paper proof did --- and whether
+that cost is worth paying is the supervisor's call, not yours.  What you should
+do is *propose*: name the statement, say why it is a good candidate (its paper
+proof is fiddly or case-heavy; it is load-bearing enough that its exact form
+should be pinned against later edits; a computation has to be trusted), and
+give an honest estimate of the work.  Then wait for an answer.  Do not open a
+`Results/` module on your own initiative.
+
+Keeping the existing development building is different, and needs no
+permission: fixing a proof that broke, updating a `Tests/` module alongside a
+statement you changed, or bumping a toolchain are ordinary maintenance.  The
+rule is about *new* formalisation.
 
 **Preserve labels when promoting.**  Moving a statement from routes to results
 keeps its label, so everything already pointing at it keeps working.

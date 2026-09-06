@@ -93,7 +93,10 @@ make formal                                              # lake build
 ```
 
 Then set the repository variable `ENABLE_LEAN` to `true` to turn on the CI job
-for it.  Bump `lean-toolchain` and the mathlib tag in `lakefile.lean` together,
+for it.  Note that `AGENTS.md` tells an agent to ask before formalising
+anything new, and to propose candidates rather than pick them: formalisation
+is the most expensive thing in the project, and what is worth that cost is
+your decision.  Bump `lean-toolchain` and the mathlib tag in `lakefile.lean` together,
 never one alone.
 
 ## How the project is meant to be run

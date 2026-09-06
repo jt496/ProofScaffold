@@ -44,10 +44,10 @@ TOKENS = ('SCAFFOLD', 'Scaffold', 'scaffold')
 STUBS = {
 'tex/results/00-introduction.tex': r"""\section{Introduction}\label{sec:intro}
 
-State the conjecture here.
+This project is an attempt on the following.
 
-\begin{conjecture}[Name it]\label{main:conj}
-The statement this project is about.
+\begin{conjecture}[@@NAME@@]\label{main:conj}
+@@CONJECTURE@@
 \end{conjecture}
 
 \begin{definition}\label{object:def}
@@ -206,14 +206,20 @@ Nothing has been computed yet.
 \input{tex/archive/40-computations}
 """,
 'tex/frontmatter/results.tex': r"""\maketitle
+% Keep this abstract in step with the mathematics.  It is one of the two
+% maintained accounts of what is established -- summarise here what this
+% edition proves, and update it when that changes.  It must not carry route
+% status: no priorities, no counts, no "currently".  The route table owns that.
 \begin{abstract}
-The established results and their proofs.  Open proof programmes, failed
-strengthenings, and detailed computational audits are maintained separately in
-the routes companion and the full working edition.
+@@CONJECTURE@@
+This edition contains the established results and their proofs.  Open proof
+programmes, failed strengthenings, and detailed computational audits are
+maintained separately in the routes companion and the full working edition.
 \end{abstract}
 """,
 'tex/frontmatter/routes.tex': r"""\maketitle
 \begin{abstract}
+@@CONJECTURE@@
 This is the companion to the results edition: the maintained record of what is
 being attempted and what has already failed.  Statements imported from the
 results edition are linked into it, so a reference to an established result
@@ -223,6 +229,7 @@ proved; anything that becomes proved moves to the results edition.
 """,
 'tex/frontmatter/archive.tex': r"""\maketitle
 \begin{abstract}
+@@CONJECTURE@@
 The complete working record: every established result with its proof, every
 live route, and the archive of superseded proofs, refuted strengthenings and
 negative examples.  This is the edition to search when asking whether something
@@ -350,8 +357,14 @@ def set_metadata(title, authors, dry):
         p.write_text(text)
 
 
-def strip_example(camel, dry):
-    """Replace the worked example with stubs that still build green."""
+def strip_example(camel, dry, conjecture, name):
+    """Replace the worked example with stubs that still build green.
+
+    The conjecture is written into the introduction and into all three
+    frontmatter abstracts, so that the editions describe the actual problem
+    from the first build rather than carrying placeholder prose that nobody
+    remembers to replace.
+    """
     remove = [
         'tex/results/01-tools.tex',
         'tex/results/02-verification.tex',
@@ -378,7 +391,8 @@ def strip_example(camel, dry):
         p = ROOT / rel
         if not dry:
             p.parent.mkdir(parents=True, exist_ok=True)
-            p.write_text(body)
+            p.write_text(body.replace('@@CONJECTURE@@', conjecture)
+                             .replace('@@NAME@@', name))
 
     if dry:
         return
@@ -585,6 +599,9 @@ def main():
     ap.add_argument('--slug', help='override the file-name slug')
     ap.add_argument('--title', help='manuscript title')
     ap.add_argument('--authors', help='manuscript authors')
+    ap.add_argument('--conjecture',
+                    help='one-sentence statement of the problem; goes into the '
+                         'introduction and all three abstracts')
     ap.add_argument('--keep-example', action='store_true',
                     help='keep the worked Goldbach example')
     ap.add_argument('--dry-run', action='store_true')
@@ -611,11 +628,15 @@ def main():
 
     title = args.title
     authors = args.authors
+    conjecture = args.conjecture
     if sys.stdin.isatty():
         title = title or ask('Manuscript title', f'The {name} conjecture')
         authors = authors or ask('Authors', 'Your Name')
+        conjecture = conjecture or ask('One-sentence statement of the problem')
     title = title or f'The {name} conjecture'
     authors = authors or 'Your Name'
+    # A placeholder that still builds: no \emph, which make check would reject.
+    conjecture = conjecture or 'State the problem here.'
 
     keep = args.keep_example
     if not keep and not args.name and sys.stdin.isatty():
@@ -623,12 +644,19 @@ def main():
 
     print(f'\n  SCAFFOLD -> {upper}\n  Scaffold -> {camel}\n  scaffold -> {slug}')
     print(f'  title    : {title}\n  authors  : {authors}')
-    print(f'  example  : {"kept" if keep else "replaced by stubs"}\n')
+    print(f'  example  : {"kept" if keep else "replaced by stubs"}')
+    if not keep:
+        print(f'  problem  : {conjecture}')
+    elif args.conjecture:
+        print('  note     : --conjecture is ignored with --keep-example, whose '
+              'abstracts describe the worked example')
+    print()
     if args.dry_run:
         print('(dry run: nothing written)')
 
     if not keep:
-        strip_example(camel='Scaffold', dry=args.dry_run)
+        strip_example(camel='Scaffold', dry=args.dry_run,
+                      conjecture=conjecture, name=camel)
     set_metadata(title, authors, args.dry_run)
     changed, renamed = rewrite_tokens(
         {'SCAFFOLD': upper, 'Scaffold': camel, 'scaffold': slug}, args.dry_run)

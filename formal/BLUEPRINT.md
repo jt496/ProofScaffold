@@ -69,6 +69,11 @@ Departures from the manuscript, in full.
 
 ## Adding to this development
 
+0. **Ask first.**  Formalising a statement is expensive, and which statements
+   are worth it is a decision for the supervisor.  Propose a candidate with a
+   reason and an estimate; do not start because a result looks formalisable.
+   This applies to new work only --- repairing what is already here is
+   maintenance.
 1. Write the LaTeX proof first, and get it into `tex/results/`.
 2. Add the `Results/` module and the `Tests/` module together.
 3. Add the Coverage row and, if the Lean statement is not literally the
