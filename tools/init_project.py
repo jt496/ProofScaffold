@@ -570,6 +570,73 @@ tools/cpp/example 10
     (ROOT / 'tex' / 'archive' / '.gitkeep').touch()
 
 
+def write_project_readme(title, slug, conjecture, dry):
+    """Turn the template's README into the project's own.
+
+    Everything from `## What you need` onward describes the repository and is
+    kept.  What comes before it describes the *template* -- how to clone it, how
+    to run `make init`, what the placeholder tokens are -- and is worse than
+    useless once init has run: it tells a reader of an initialised project to
+    initialise it.  That is replaced by a header naming the problem and pointing
+    at the two accounts that are actually maintained.
+
+    This runs after the token rewrite, so the text written here is final; it
+    mentions ProofScaffold, which contains one of the placeholder tokens and
+    would otherwise be rewritten too.
+    """
+    p = ROOT / 'README.md'
+    if not p.exists():
+        return
+    text = p.read_text()
+    marker = '## What you need'
+    if marker not in text:
+        print('note: README.md has no "## What you need" section; left as it is.')
+        return
+
+    problem = conjecture.strip()
+    if problem and problem != 'State the problem here.':
+        opening = f'A long-running attempt on the following problem.\n\n> {problem}'
+    else:
+        opening = ('A long-running proof search.  Replace this paragraph with a\n'
+                   'statement of the problem.')
+
+    header = f"""# {title}
+
+{opening}
+
+**This file describes the shape of the repository, not the state of the work.**
+It deliberately says nothing about what is currently proved, how many routes are
+open, or how far the formalisation has got.  A second account of any of that
+would be a second thing to keep in step, and it is always the copy nobody
+remembers to update that a newcomer reads first.
+
+Two places are maintained, and they are the ones to read:
+
+* **where the problem stands** — the route table in
+  [`tex/routes/00-status-map.tex`](tex/routes/00-status-map.tex), rendered at
+  the front of `output/pdf/plain/{slug}-routes.pdf`.  It is the only place
+  status is asserted anywhere in the project.
+* **what is established** — the abstract and introduction of the results
+  edition, `output/pdf/plain/{slug}-results.pdf`, which are maintained with the
+  mathematics they describe.
+
+[`MANUSCRIPT.md`](MANUSCRIPT.md) is the contract for how work is recorded, and
+[`AGENTS.md`](AGENTS.md) the operating instructions for an agent working here.
+This repository was built from the
+[ProofScaffold](https://github.com/jt496/ProofScaffold) template.
+
+## Start here
+
+```sh
+make all                              # six PDFs, then every consistency check
+git config core.hooksPath .githooks   # once per clone: refuse pushes that do not build
+```
+
+"""
+    if not dry:
+        p.write_text(header + text[text.index(marker):])
+
+
 def strip_template_section():
     """Remove the 'About this template' block from README.md."""
     p = ROOT / 'README.md'
@@ -662,6 +729,7 @@ def main():
         {'SCAFFOLD': upper, 'Scaffold': camel, 'scaffold': slug}, args.dry_run)
     if not args.dry_run:
         strip_template_section()
+    write_project_readme(title, slug, conjecture, args.dry_run)
 
     print(f'{changed} files rewritten, {renamed} paths renamed.')
     where = ('the worked example under tex/results/ and tex/routes/, which you '
