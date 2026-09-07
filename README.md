@@ -39,12 +39,28 @@ manuscript label, and a note explaining what the refutation rules out.
 
 ## Start here
 
+Start from the template, so that `origin` is your own repository from the very
+first commit:
+
 ```sh
-git clone <this repo> MyConjecture && cd MyConjecture
-make init                      # name the project; replaces the worked example
-make all                       # six PDFs, then every consistency check
-git config core.hooksPath .githooks   # refuse pushes that do not build
+gh repo create MyConjecture --private --template jt496/ProofScaffold
+git clone https://github.com/<you>/MyConjecture && cd MyConjecture
+make init      # name the project; replaces the worked example
+make all       # six PDFs, then every consistency check
 ```
+
+GitHub's **Use this template** button does the same thing.
+
+**Do not just clone this repository and start work in it.**  A clone leaves
+`origin` pointing here, so the first `git push` of your new project lands on
+the scaffold instead of on your own repository — and because `AGENTS.md` tells
+an agent to commit and push as it goes, that push may well happen before you
+have looked at the remote.  If you have already cloned directly, `make init`
+removes the `origin` remote for you and says so; add your own before pushing.
+
+`make init` also sets `core.hooksPath` to `.githooks`, which activates the hook
+that refuses a push whose tree does not build.  That setting is per clone and
+is not itself cloned, so a later clone of your project needs it again.
 
 One thing to keep in mind as the project grows: this README should describe the
 *shape* of the repository, not the *state* of the work.  Resist putting a list
@@ -186,8 +202,9 @@ formal/
 
 ## Local checks before a push
 
-`.githooks/pre-push` refuses a push whose tree does not build.  Activate it
-once per clone:
+`.githooks/pre-push` refuses a push whose tree does not build.  `make init`
+activates it, but the setting is local to a clone and is not itself cloned, so
+every later clone of your project has to repeat it:
 
 ```sh
 git config core.hooksPath .githooks

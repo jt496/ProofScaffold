@@ -24,6 +24,7 @@ import argparse
 import pathlib
 import re
 import shutil
+import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -34,6 +35,9 @@ SKIP_FILES = {'tools/init_project.py'}
 TEXTUAL = {'.tex', '.md', '.py', '.pl', '.lean', '.yml', '.yaml', '.json',
            '.txt', '.cpp', '.hpp', '.log', '.toml', '.cfg', ''}
 TOKENS = ('SCAFFOLD', 'Scaffold', 'scaffold')
+# A fork of the scaffold is still the scaffold, so match the repository name
+# under any owner, over both the HTTPS and the SSH spelling of a remote.
+TEMPLATE_REMOTE = re.compile(r'[/:][^/:]+/ProofScaffold(?:\.git)?/*$', re.I)
 
 
 # ---------------------------------------------------------------------------
@@ -648,6 +652,64 @@ def strip_template_section():
     p.write_text(text)
 
 
+def git(*arguments):
+    """Run git in ROOT.  Returns its stdout, or None if the command failed.
+
+    Every caller treats None as "cannot tell", so the initializer still works
+    in a tree that is not a git worktree at all -- an unpacked tarball, or the
+    copy the end-to-end test makes without a .git directory.
+    """
+    try:
+        done = subprocess.run(('git',) + arguments, cwd=str(ROOT), text=True,
+                              capture_output=True, timeout=15)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return done.stdout.strip() if done.returncode == 0 else None
+
+
+def own_worktree():
+    """True when ROOT is the top of a git worktree, rather than inside one."""
+    top = git('rev-parse', '--show-toplevel')
+    if not top:
+        return False
+    try:
+        return pathlib.Path(top).resolve() == ROOT
+    except OSError:
+        return False
+
+
+def detach_template_remote(dry):
+    """Stop a push from landing on the scaffold this project was cloned from.
+
+    Cloning leaves `origin` pointing at the template, so the first push of the
+    new project goes to the template itself.  Removing the remote turns that
+    silent mistake into a loud failure, which is the whole point; the caller
+    prints the URL so the removal is never a surprise.
+    """
+    if not own_worktree():
+        return None
+    url = git('remote', 'get-url', 'origin')
+    if not url or not TEMPLATE_REMOTE.search(url):
+        return None
+    if not dry:
+        git('remote', 'remove', 'origin')
+    return url
+
+
+def activate_hooks(dry):
+    """Activate the tracked pre-push hook, which is inert until pointed at.
+
+    `.git/hooks` is not cloned, so `.githooks/pre-push` -- the hook that
+    refuses a push whose tree does not build -- does nothing until
+    core.hooksPath names it.
+    """
+    if not own_worktree():
+        return False
+    if dry:
+        return True
+    return git('config', 'core.hooksPath', '.githooks') is not None
+
+
 def ask(prompt, default=''):
     suffix = f' [{default}]' if default else ''
     try:
@@ -732,6 +794,26 @@ def main():
     write_project_readme(title, slug, conjecture, args.dry_run)
 
     print(f'{changed} files rewritten, {renamed} paths renamed.')
+
+    detached = detach_template_remote(args.dry_run)
+    if detached:
+        verb = 'would remove' if args.dry_run else 'Removed'
+        print(f"""
+{verb} the `origin` remote, which still pointed at the scaffold:
+
+    {detached}
+
+Left in place, a push from this project would have landed on the template.""")
+    if activate_hooks(args.dry_run):
+        print('core.hooksPath is now .githooks: a push whose tree does not '
+              'build is refused.')
+
+    publish = (f"""
+Then create your own repository, which this clone does not yet have:
+
+    gh repo create <owner>/{camel} --private --source=. --remote=origin --push
+""" if detached else '')
+
     where = ('the worked example under tex/results/ and tex/routes/, which you '
              'can now\nedit or delete'
              if keep else
@@ -742,7 +824,7 @@ Next:
 
     make all            # six PDFs and every check; should pass as-is
     git add -A && git commit -m 'Initialise {camel}'
-
+{publish}
 Then read MANUSCRIPT.md, write your conjecture into {where}.
 
 The LICENSE file still carries the scaffold author's copyright line; put your
