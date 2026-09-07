@@ -5,28 +5,22 @@ on:
   pull_request:
   workflow_dispatch:
 
-# ---------------------------------------------------------------------------
-# Actions minutes are free on public repositories and metered on private ones.
-# A project started from this template is usually private, and a proof search
-# pushes often, so every job below is gated: it runs automatically only when
-# the repository is public.
-#
-# On a private repository nothing runs and nothing is billed -- a job skipped
-# by `if` never allocates a runner. Build locally with `make all` instead; it
-# is the same set of checks, and AGENTS.md already requires it before work is
-# called done.
-#
-# Two escape hatches: run it by hand from the Actions tab (workflow_dispatch),
-# or set the repository variable ENABLE_CI to `true`
-# (Settings -> Secrets and variables -> Actions -> Variables) to turn automatic
-# runs back on while staying private.
-#
-# The condition is repeated on each job rather than computed once, because a
-# job that computes it would itself cost a billable minute on every push --
-# GitHub rounds each job up to the minute -- which is the cost we are avoiding.
-# ---------------------------------------------------------------------------
+# Source checks and tooling tests run on public AND private repositories.
+# They consume runner time; only the more expensive jobs retain the opt-in
+# gate for private repositories. ENABLE_CI enables those jobs, while Lean
+# additionally requires ENABLE_LEAN. Local hooks are not a CI substitute.
+permissions:
+  contents: read
 
 jobs:
+  source-checks:
+    name: source checks and tooling regressions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check sources and regression tests (no TeX or Lean)
+        run: make check-source test
+
   manuscript:
     name: manuscript and checks
     runs-on: ubuntu-latest
@@ -44,8 +38,7 @@ jobs:
             texlive-latex-recommended texlive-latex-extra \
             texlive-fonts-recommended latexmk
 
-      # `make all` builds the six PDFs and then runs every consistency check:
-      # labels, ownership, manifests, glossary, and the LaTeX logs.
+      # Build the six PDFs, run source/log checks and regression tests.
       - name: Build and check
         run: make all
 
@@ -57,7 +50,7 @@ jobs:
           if-no-files-found: error
 
   tools:
-    name: computational audit
+    name: computational smoke tests
     runs-on: ubuntu-latest
     if: >-
       github.event_name == 'workflow_dispatch'
@@ -65,10 +58,9 @@ jobs:
       || vars.ENABLE_CI == 'true'
     steps:
       - uses: actions/checkout@v5
-      # Every program here exits non-zero on failure and prints a pass/fail
-      # line, so this job needs no human reading its output.
-      - name: Build and audit
-        run: make audit CXXFLAGS='-O2 -std=c++17 -Wall'
+      # Every program exits non-zero on failure and prints a pass/fail line.
+      - name: Build and smoke-test
+        run: make smoke CXXFLAGS='-O2 -std=c++17 -Wall'
 
   formal:
     name: lean

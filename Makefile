@@ -5,6 +5,9 @@
 #   make init        name the project (rewrites the SCAFFOLD/scaffold placeholders)
 #   make all         the six PDFs, then every consistency check
 #   make check       the consistency checks alone (needs the PDFs)
+#   make check-source check sources without building PDFs
+#   make test        run adversarial tooling regression tests
+#   make smoke       run computational smoke tests (alias of audit)
 #   make tools       build the C++ toolkit
 #   make audit       run the fast computational self-checks
 #   make formal      lake build (opt-in; see README.md)
@@ -28,9 +31,9 @@ EDITIONS := results routes full
 PLAIN    := $(foreach e,$(EDITIONS),output/pdf/plain/$(SLUG)-$(e).pdf)
 LINKED   := $(foreach e,$(EDITIONS),output/pdf/linked/$(SLUG)-$(e).pdf)
 
-.PHONY: all plain linked results routes full formal check tools audit init clean
+.PHONY: all plain linked results routes full formal check check-source test tools audit smoke init clean
 
-all: plain linked check
+all: plain linked check test
 
 plain:  $(PLAIN)
 linked: $(LINKED)
@@ -62,7 +65,7 @@ build/plain/full/$(SLUG)-full.pdf: tex/editions/$(SLUG)-full.tex $(TEX_SOURCES)
 # resolves there.  The working directory stays the repository root, which keeps
 # the \externaldocument path in the preamble valid.
 # ---------------------------------------------------------------------------
-$(LINKED_STAMP): $(TEX_SOURCES) tools/link-all-terms.txt tools/python/link_all.py
+$(LINKED_STAMP): $(TEX_SOURCES) tools/link-all-terms.txt tools/python/link_all.py tools/python/tex_source.py
 	$(PYTHON) tools/python/link_all.py $(LINKED_SRC)
 	touch $@
 
@@ -104,16 +107,19 @@ endef
 $(foreach e,$(EDITIONS),$(eval $(call release_rules,$(e))))
 
 # ---------------------------------------------------------------------------
-# Checks.  `check` needs the PDFs, because it greps the LaTeX logs for
-# unresolved references that latexmk itself reports only as a warning.
+# Source checks and tests need no TeX installation. The full check also reads
+# all six explicitly named logs, failing if even one is missing or unreadable.
 # ---------------------------------------------------------------------------
-check: $(PLAIN) $(LINKED)
-	perl tools/check_manuscript.pl
-	@if grep -nE "undefined references|multiply defined|There were undefined" \
-	      build/plain/*/*.log build/linked/*/*.log; then \
-		echo "LaTeX reference check failed"; exit 1; \
-	fi
-	@echo "LaTeX reference check passes"
+LATEX_LOGS := $(foreach e,$(EDITIONS),build/plain/$(e)/$(SLUG)-$(e).log build/linked/$(e)/$(SLUG)-$(e)-linked.log)
+
+check-source:
+	$(PYTHON) tools/python/check_manuscript.py
+
+test:
+	$(PYTHON) -m unittest discover -s tools/tests -v
+
+check: check-source $(PLAIN) $(LINKED)
+	$(PYTHON) tools/python/check_latex_logs.py $(LATEX_LOGS)
 
 # ---------------------------------------------------------------------------
 # Standalone documents.  Not views of the manuscript: own preamble, own class,
@@ -135,6 +141,9 @@ check: $(PLAIN) $(LINKED)
 
 tools:
 	$(MAKE) -C tools/cpp
+
+# This is only a fast subset, not reproduction of every manuscript claim.
+smoke: audit
 
 audit: tools
 	tools/cpp/goldbach 100000

@@ -13,8 +13,9 @@ It gives you three things, wired together:
 | `tools/` | a **computational toolkit** (C++ and Python) with a rule that every computational claim names its program, its command, and its log |
 | `formal/` | a **Lean 4 / mathlib** development with a blueprint mapping every manuscript label to its formal counterpart |
 
-and, holding them together, `make check`: a set of consistency checks that fail
-the build when the record and the mathematics drift apart.
+and, holding them together, `make check`: source and build checks for labels,
+edition ownership, glossary links, and generated outputs. These checks do not
+validate mathematical proofs; their exact scope is in [tools/VALIDATION.md](tools/VALIDATION.md).
 
 There is deliberately **no notes or scratch directory**. The manuscript is the
 single source of truth: a fact worth keeping is written into `tex/`, where the
@@ -72,8 +73,10 @@ After it runs it is inert; the example remains in the git history.
 ## What you need
 
 `make all` needs **LaTeX** (`latexmk` and a TeX Live installation with
-`hyperref`, `xr-hyper`, `showkeys`, `longtable`), **Perl**, and **Python 3**.
-Nothing else, and no Python packages.
+`hyperref`, `xr-hyper`, `showkeys`, `longtable`), **Perl**, **Python 3.10+**,
+**Bash**, **Git**, and **Make**. No third-party Python packages are required.
+The Git and Bash requirements support the tooling regression tests included
+in `make all`.
 
 ```sh
 sudo apt install texlive-latex-recommended texlive-latex-extra \
@@ -125,11 +128,14 @@ The one-paragraph version:
 ## The build
 
 ```sh
-make all       # all six PDFs, then the reference, ownership and glossary checks
+make all       # all six PDFs, source/log checks and tooling regression tests
 make results   # both variants of one edition
-make check     # the checks alone (needs the PDFs)
+make check     # source and LaTeX log checks (needs the PDFs)
+make check-source  # source checks only; no TeX installation needed
+make test      # adversarial tooling regressions; no TeX or Lean needed
 make tools     # build the C++ toolkit
 make audit     # the fast computational self-checks
+make smoke     # explicit alias for that subset, not full claim reproduction
 make formal    # lake build (opt-in, see above)
 make clean
 ```
@@ -140,11 +146,12 @@ where a PDF you intend to send to a person belongs.
 
 `make check` is where most of the value is.  It fails the build when a label is
 duplicated or dangling, when the results edition comes to depend on the
-companion, when a module is missing from the full manifest, when a glossary row
-has no definition or a definition has no row, when a term is linked from an
-edition its row is gated out of, and when a newly emphasised word is neither
-defined nor acknowledged as local.  Each of those checks exists because the
-corresponding mistake is easy to make and expensive to find later.
+companion, when a module is missing or has the wrong edition ownership in a
+manifest, when a glossary row has no definition or a definition has no row,
+when a term is linked from an edition its row is gated out of, and when a newly
+emphasised word is neither defined nor acknowledged as local. Each of those
+checks exists because the corresponding mistake is easy to make and expensive
+to find later.
 
 ## Layout
 
@@ -165,8 +172,10 @@ tex/
   standalone/        self-contained documents that are not views of the paper
 
 tools/
-  check_manuscript.pl   the consistency checks
+  check_manuscript.pl   compatibility entry point for the source checker
   cpp/, python/         the toolkit; logs/ retains what the paper cites
+  tests/                adversarial tooling regression fixtures
+  VALIDATION.md         guarantees, supported syntax and limitations
   init_project.py       one-time project naming
 
 formal/
@@ -184,32 +193,31 @@ once per clone:
 git config core.hooksPath .githooks
 ```
 
-It lives in a tracked directory because `.git/hooks` is not cloned, so a hook
-kept there would exist only on the machine that wrote it.  On a private
-repository this is the substitute for CI: it costs no Actions minutes, and
-`make all` takes seconds once the build tree is warm.  Bypass it deliberately
-with `git push --no-verify`.
+It lives in a tracked directory because `.git/hooks` is not cloned. Each distinct
+pushed commit tip is built in a clean detached worktree, including non-current
+branches and annotated tags. Uncommitted changes cannot make a broken commit
+pass. This may rebuild all outputs rather than reuse the local build directory.
+
+The hook is a local guard, not receiving-side enforcement. Bypass it deliberately
+with `git push --no-verify`. It validates pushed tips, not every intermediate
+commit. See [tools/VALIDATION.md](tools/VALIDATION.md) for limits and supported syntax.
 
 ## Continuous integration
 
-`.github/workflows/ci.yml` builds the manuscript, runs `make check`, and runs
-`make audit`.
+`.github/workflows/ci.yml` runs cheap source checks and tooling regression tests
+on both public and private repositories. Private runs allocate a runner and may
+consume Actions minutes.
 
-**It runs automatically only while the repository is public.**  Actions minutes
-are free on public repositories and metered on private ones, and a project
-started from this template is usually private and pushed to often.  On a
-private repository every job is skipped, and a skipped job allocates no runner
-and costs nothing — so the workflow can sit in the tree unused until you want
-it, rather than having to be deleted and later reconstructed.
+The more expensive manuscript and computational-audit jobs run automatically on
+public repositories. For private repositories, trigger a run manually or set
+`ENABLE_CI=true` under the repository's Actions variables. The Lean job additionally
+requires `ENABLE_LEAN=true`. The workflow uses read-only repository permissions.
 
-Build locally instead: `make all` runs exactly the same checks in seconds, and
-`AGENTS.md` already requires it before work is called done.
-
-To use CI on a private repository, either trigger a run by hand from the
-Actions tab, or set the repository variable `ENABLE_CI` to `true` under
-*Settings → Secrets and variables → Actions → Variables*.  The Lean job needs
-`ENABLE_LEAN` set to `true` as well, since a first mathlib build downloads
-several gigabytes.
+`make audit` (also named `make smoke`) runs the configured fast computational
+subset. It is not full reproduction of every retained claim. Use a claim's exact
+recorded command and domain for that. A successful build does not establish
+proof correctness, experiment provenance, or that a formal statement faithfully
+represents the manuscript.
 
 ## License
 
