@@ -1,39 +1,56 @@
 #!/usr/bin/env bash
-# Refuse to push a tree that does not build.
-#
-# Activated per clone with
-#     git config core.hooksPath .githooks
-# which is why this lives in a tracked directory: .git/hooks is not cloned, so
-# a hook kept there exists only on the machine that wrote it.
-#
-# This is the private-repository substitute for CI. `make all` builds the six
-# PDFs and runs every consistency check, and takes seconds once the build tree
-# is warm, so it is cheap enough to run on every push.
-#
-# Bypass deliberately with `git push --no-verify`.
-set -uo pipefail
+# Check each distinct pushed commit, never the current working tree.
+# Activate with: git config core.hooksPath .githooks
+# Local hooks are bypassable; receiving-side CI remains the enforcement point.
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+# Git exports repository-local variables to hooks. They must not make commands
+# executed in the detached worktree refer back to the user's index/worktree.
+while read -r variable; do
+    unset "$variable"
+done < <(git rev-parse --local-env-vars)
 
-cd "$(git rev-parse --show-toplevel)" || exit 1
+temporary=''
+cleanup() {
+    status=$?
+    trap - EXIT
+    if [ -n "$temporary" ]; then
+        git worktree remove --force "$temporary/tree" >/dev/null 2>&1 || true
+        rm -rf -- "$temporary"
+    fi
+    exit "$status"
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
-# Nothing to check when every ref being pushed is a deletion.
-all_deletes=1
-while read -r _local_ref local_sha _remote_ref _remote_sha; do
+seen=' '
+while read -r local_ref local_sha _remote_ref _remote_sha; do
     [ -n "${local_sha:-}" ] || continue
     case "$local_sha" in
-        *[!0]*) all_deletes=0 ;;
+        *[!0]*) ;;
+        *) continue ;; # deletion
     esac
+    # Peel annotated tags. Refuse non-commit objects rather than silently
+    # reporting a successful manuscript build for an uncheckable target.
+    if ! commit=$(git rev-parse --verify "$local_sha^{commit}"); then
+        echo "pre-push: $local_ref does not identify a commit; refusing push." >&2
+        exit 1
+    fi
+    case "$seen" in
+        *" $commit "*) continue ;;
+    esac
+    seen="$seen$commit "
+    temporary=$(mktemp -d "${TMPDIR:-/tmp}/proof-pre-push.XXXXXXXX")
+    git -c core.hooksPath=/dev/null worktree add --quiet --detach "$temporary/tree" "$commit" </dev/null
+    echo "pre-push: make all at $commit ($local_ref)"
+    # Never let a build consume subsequent ref records from the hook stdin.
+    if ! (cd "$temporary/tree" && make all </dev/null); then
+        echo "pre-push: pushed commit failed; working-tree edits were not used." >&2
+        echo "          Fix and commit, or deliberately bypass with --no-verify." >&2
+        exit 1
+    fi
+    git worktree remove --force "$temporary/tree"
+    rmdir "$temporary"
+    temporary=''
 done
-[ "$all_deletes" -eq 1 ] && exit 0
-
-if [ -n "$(git status --porcelain)" ]; then
-    echo "pre-push: working tree is dirty; the checks below run against the" >&2
-    echo "          working tree, not against the commits being pushed." >&2
-fi
-
-echo "pre-push: make all"
-if ! make all; then
-    echo >&2
-    echo "pre-push: 'make all' failed, so the push was refused." >&2
-    echo "          Fix it and push again, or bypass with --no-verify." >&2
-    exit 1
-fi
